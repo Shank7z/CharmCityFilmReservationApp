@@ -46,13 +46,13 @@ public class SupabaseFunctionality : MonoBehaviour
             Debug.LogWarning("Supabase not initialized yet");
             return;
         }
-        var result = await Retrieve<Rooms>(123123);
+        var result = await RetrieveByID<Rooms>(123123);
 
 
         testTextBox.text = "" + result.name + "\n" + result.description + "\n Active: " + result.active;
     }
 
-    public async Task<T> Retrieve<T>(int id) where T : BaseModel, IHasID, new()
+    public async Task<T> RetrieveByID<T>(int id) where T : BaseModel, IHasID, new()
     {
         var result = await _supabase
             .From<T>()
