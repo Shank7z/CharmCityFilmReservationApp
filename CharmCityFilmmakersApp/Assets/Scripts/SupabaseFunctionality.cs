@@ -2,9 +2,17 @@ using UnityEngine;
 using Supabase;
 using System.Threading.Tasks;
 using TMPro;
+using Supabase.Postgrest.Models;
 
 public class SupabaseFunctionality : MonoBehaviour
 {
+
+    public enum TableType
+    {
+        Profile,
+        Room,
+        Reservation
+    }
     public TextMeshProUGUI testTextBox;
 
     public const string SUPABASE_URL = "https://xozwpzdevpxfduhyyjpt.supabase.co";
@@ -18,7 +26,6 @@ public class SupabaseFunctionality : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private async void Start()
     {
-        Debug.Log("Starting");
         await Initialize();
         await Test();
     }
@@ -31,25 +38,46 @@ public class SupabaseFunctionality : MonoBehaviour
         await _supabase.InitializeAsync();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private async Task Test()
     {
         Debug.Log("Testing");
-        if(_supabase == null)
+        if (_supabase == null)
         {
             Debug.LogWarning("Supabase not initialized yet");
             return;
         }
-        var result = await _supabase
-            .From<Rooms>()
-            .Get();
+        var result = await Retrieve<Rooms>(123123);
 
-        var room1 = result.Models[0];
-        testTextBox.text = "" + room1.name + "\n" + room1.description + "\n Active: " + room1.active;
+
+        testTextBox.text = "" + result.name + "\n" + result.description + "\n Active: " + result.active;
+    }
+
+    public async Task<T> Retrieve<T>(int id) where T : BaseModel, IHasID, new()
+    {
+        var result = await _supabase
+            .From<T>()
+            .Where(x => x.id == id)
+            .Single();
+
+        return result;
+    }
+    
+
+    private async Task<Profiles> RetrieveProfile(int id)
+    {
+        var result = await _supabase.From<Profiles>().Where(x => x.id == id).Single();
+        return result;
+    }
+
+    private async Task<Rooms> RetrieveRoom(int id)
+    {
+        var result = await _supabase.From<Rooms>().Where(x => x.id == id).Single();
+        return result;
+    }
+
+    private async Task<Reservations> RetrieveReservation(int id)
+    {
+        var result = await _supabase.From<Reservations>().Where(x => x.id == id).Single();
+        return result;
     }
 }
