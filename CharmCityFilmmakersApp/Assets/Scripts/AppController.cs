@@ -35,7 +35,7 @@ public class AppController : MonoBehaviour
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
-        currentScreen = splashScreen;
+        currentScreen = loginScreen;
     }
 
     public void LoadApp()
@@ -45,6 +45,7 @@ public class AppController : MonoBehaviour
 
     private IEnumerator Initialize()
     {
+        if (currentScreen == loginScreen) yield break;
         yield return new WaitForSeconds(1f);
         ChangeScreen(Screens.Login);
     }

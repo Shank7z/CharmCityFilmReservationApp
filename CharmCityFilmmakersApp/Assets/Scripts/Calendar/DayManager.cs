@@ -12,7 +12,7 @@ public class DayManager : MonoBehaviour
 
     public bool hideSurroundingDays;
 
-    private DayArgs info;
+    public DayArgs info;
 
     private Image background;
     private void Start()
