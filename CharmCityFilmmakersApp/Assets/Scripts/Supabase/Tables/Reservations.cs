@@ -2,7 +2,7 @@ using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Attributes;
 using System;
 #nullable enable
-
+[Serializable]
 [Table("Reservations")]
 public class Reservations : BaseModel, IHasID
 {
@@ -16,16 +16,16 @@ public class Reservations : BaseModel, IHasID
     public int? userId { get; set; }
 
     [Column("start_time")]
-    public DateTime? startTime { get; set; }
+    public DateTime startTime { get; set; }
 
     [Column("end_time")]
-    public DateTime? endTime { get; set; }
-
-    [Column("name")]
-    public string? name { get; set; }
+    public DateTime endTime { get; set; }
 
     [Column("notes")]
     public string? notes { get; set; }
+
+    [Column("createdAt")]
+    public string? creationTime { get; set; }
 
     [Column("status")]
     public string? status { get; set; }

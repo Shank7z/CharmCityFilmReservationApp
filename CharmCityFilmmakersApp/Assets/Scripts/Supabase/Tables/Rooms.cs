@@ -17,6 +17,6 @@ public class Rooms : BaseModel, IHasID
     [Column("active")]
     public bool? active { get; set; }
 
-    [Column("parent_room_id")]
-    public int? parentRoom { get; set; }
+    [Column("is_full_studio")]
+    public bool? isFullStudio { get; set; }
 }

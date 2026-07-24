@@ -5,6 +5,7 @@ using Supabase.Postgrest.Attributes;
 [Table("Profiles")]
 public class Profiles : BaseModel, IHasID
 {
+
     [PrimaryKey("id")]
     public int id { get; set; }
 
@@ -14,9 +15,21 @@ public class Profiles : BaseModel, IHasID
     [Column("email")]
     public string? email { get; set; }
 
-    [Column("role")]
-    public string? role { get; set; }
+    [Column("status")]
+    public user_status? userStatus { get; set; }
+    public enum user_status
+    {
+        admin,
+        active,
+        inactive
+    }
 
     [Column("created_at")]
     public string? creationTime { get; set; }
+
+    [Column("password")]
+    public string? password { get; set; }
+
+    [Column("username")]
+    public string? username { get; set; }
 }
