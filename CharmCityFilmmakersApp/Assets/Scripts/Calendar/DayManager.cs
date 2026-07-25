@@ -1,11 +1,13 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class DayManager : MonoBehaviour
 {
+    public ReservationPopup reservationPopup;
     public TextMeshProUGUI dateText;
     public Transform barHolder;
     public BarManager[] bars;
@@ -20,6 +22,7 @@ public class DayManager : MonoBehaviour
         if (dateText == null) dateText = transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         background = GetComponentInParent<Image>();
     }
+
     public void Setup(DayArgs info)
     {
         ToggleDay(true);
@@ -52,5 +55,11 @@ public class DayManager : MonoBehaviour
             if (roomReserved.Count <= 0) bars[x].GetComponent<CanvasGroup>().alpha = 0;
             else bars[x].GetComponent<CanvasGroup>().alpha = 1;
         }
+    }
+
+    public void OpenReservationPopup()
+    {
+        Debug.Log($"Clicked {info.date}");
+        CalendarManager.Instance.ShowReservationPopup(info);
     }
 }

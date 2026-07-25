@@ -24,7 +24,7 @@ public class Reservations : BaseModel, IHasID
     [Column("notes")]
     public string? notes { get; set; }
 
-    [Column("createdAt")]
+    [Column("created_at")]
     public string? creationTime { get; set; }
 
     [Column("status")]

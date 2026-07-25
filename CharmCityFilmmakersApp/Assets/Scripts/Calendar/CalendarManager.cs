@@ -10,8 +10,8 @@ public class CalendarManager : MonoBehaviour
     public List<SingleMonthPage> pages;
     public Transform dayPrefab;
     public int daysToDisplay;
+    public ReservationPopup reservationPopup;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         if (Instance == null) Instance = this;
@@ -19,8 +19,6 @@ public class CalendarManager : MonoBehaviour
         LayoutSetup();
         PageSetup();
     }
-
-
 
     private async void PageSetup()
     {
@@ -54,5 +52,11 @@ public class CalendarManager : MonoBehaviour
         pageToUpdate.SetDateTime(pageToUpdate.monthStart.AddMonths(change));
         pageToUpdate.SetHeaderText();
         await pageToUpdate.SetGrid(daysToDisplay);
+    }
+
+    public void ShowReservationPopup(DayArgs da)
+    {
+        reservationPopup.gameObject.SetActive(true);
+        reservationPopup.Setup(da);
     }
 }

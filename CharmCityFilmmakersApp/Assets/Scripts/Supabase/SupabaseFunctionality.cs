@@ -29,6 +29,8 @@ public class SupabaseFunctionality : MonoBehaviour
 
     public static Client supabase => _supabase;
 
+    public int currentUserID;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private async void Start()
     {
@@ -67,6 +69,26 @@ public class SupabaseFunctionality : MonoBehaviour
     {
         var result = await _supabase.From<Reservations>().Where(x => (x.endTime > start && x.startTime < end)).Get();
         return result.Models.ToList<Reservations>();
+    }
+
+    public async Task<bool> CreateReservations( List<int> roomIDs, DateTime start, DateTime end)
+    {
+        var parameters = new Dictionary<string, object>
+    {
+        { "p_room_ids", roomIDs.ToArray() },
+        { "p_user_id", currentUserID },
+        { "p_start_time", start },
+        { "p_end_time", end }
+    };
+        Debug.Log("Calling sql querry");
+        var result = await supabase.Rpc<bool>(
+            "create_reservations",
+            parameters
+        );
+
+        Debug.Log(result);
+
+        return result;
     }
 
 

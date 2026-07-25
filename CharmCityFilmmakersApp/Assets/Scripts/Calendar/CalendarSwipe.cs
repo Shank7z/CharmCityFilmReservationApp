@@ -7,6 +7,7 @@ public class CalendarSwipe : MonoBehaviour, IEndDragHandler, IBeginDragHandler, 
 {
     [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private RectTransform pages;
+    [SerializeField] private RectTransform[] singlePages;
 
     private RectTransform viewport;
     [SerializeField] private float snapSpeed;
@@ -24,13 +25,17 @@ public class CalendarSwipe : MonoBehaviour, IEndDragHandler, IBeginDragHandler, 
     private void Start()
     {
         viewport = scrollRect.viewport;
-
+        pageWidth = viewport.rect.width + spacing;
+        pages.sizeDelta = new Vector2(pageWidth * 3 - spacing, pages.sizeDelta.y);
+        pages.anchoredPosition = new Vector2(pages.rect.x / 2, 0);
+        foreach(RectTransform rt in singlePages)
+        {
+            rt.sizeDelta = new Vector2(viewport.rect.width, rt.sizeDelta.y);
+        }
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        pageWidth = viewport.rect.width + spacing;
-
         float currentX = -pages.anchoredPosition.x;
         int currentPage = Mathf.RoundToInt(currentX / pageWidth);
 

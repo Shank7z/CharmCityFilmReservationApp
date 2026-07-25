@@ -45,9 +45,13 @@ public class AppController : MonoBehaviour
 
     private IEnumerator Initialize()
     {
-        if (currentScreen == loginScreen) yield break;
-        yield return new WaitForSeconds(1f);
-        ChangeScreen(Screens.Login);
+        yield return new WaitForSeconds(2);
+        if (currentScreen != loginScreen)
+        {
+            yield return new WaitForSeconds(1f);
+            yield return StartCoroutine(ScreenTransition(Screens.Login));
+        }
+        loginScreen.GetComponent<LoginHandler>().Load();
     }
 
     public void ChangeScreen(Screens screen)

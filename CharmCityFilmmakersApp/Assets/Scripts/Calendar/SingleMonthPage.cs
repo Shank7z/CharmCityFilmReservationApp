@@ -20,7 +20,6 @@ public class SingleMonthPage : MonoBehaviour
     public int dayOfWeek;
 
     public List<DayManager> days;
-    private DayArgs args = new DayArgs();
 
     public void SetDateTime(DateTime dt)
     {
@@ -42,6 +41,7 @@ public class SingleMonthPage : MonoBehaviour
         List<Reservations> monthReservations = await SupabaseFunctionality.Instance.RetrieveReservations(workingDay, workingDay.AddDays(dayCount-1));
         for (int x = 0; x < dayCount; x++)
         {
+            DayArgs args = new DayArgs();
             Debug.Log("Entered loop");
             List<Reservations> dayReservations = monthReservations.Where(y => y.startTime.Date <= workingDay.Date && y.endTime.Date >= workingDay.Date).ToList();
             args.reservationList = dayReservations;
