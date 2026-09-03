@@ -1,4 +1,3 @@
-using UnityEditor.Search;
 using UnityEngine;
 
 public abstract class PopupBox : MonoBehaviour
@@ -9,7 +8,7 @@ public abstract class PopupBox : MonoBehaviour
     // Makes own gameobject active
     public abstract void Show();
 
-    // Makes own gameobject inactive
+    // Makes own gameobject inactiv
     public abstract void Hide();
 
     // Refresh UI with updated database info

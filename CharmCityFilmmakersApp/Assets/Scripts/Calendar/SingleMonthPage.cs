@@ -19,6 +19,8 @@ public class SingleMonthPage : MonoBehaviour
     public int daysInMonth;
     public int dayOfWeek;
 
+    public float offDayOpacity;
+
     public List<DayManager> days;
 
     public void SetDateTime(DateTime dt)
@@ -38,7 +40,7 @@ public class SingleMonthPage : MonoBehaviour
     {
         dayOfWeek = (int)monthStart.DayOfWeek;
         DateTime workingDay = monthStart.AddDays(-dayOfWeek);
-        List<Reservations> monthReservations = await SupabaseFunctionality.Instance.RetrieveReservations(workingDay, workingDay.AddDays(dayCount-1));
+        List<Reservations> monthReservations = await SupabaseFunctionality.Instance.RetrieveReservations(workingDay, workingDay.AddDays(dayCount - 1));
         for (int x = 0; x < dayCount; x++)
         {
             DayArgs args = new DayArgs();
@@ -47,8 +49,9 @@ public class SingleMonthPage : MonoBehaviour
             args.reservationList = dayReservations;
             args.date = workingDay;
             days[x].Setup(args);
+            if (args.date.Month != monthStart.Month) days[x].GetComponent<CanvasGroup>().alpha = offDayOpacity;
+            else days[x].GetComponent<CanvasGroup>().alpha = 1;
             workingDay = workingDay.AddDays(1);
         }
     }
-
 }

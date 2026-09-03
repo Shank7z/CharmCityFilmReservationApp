@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6670831470403184119}
   - component: {fileID: 781086400986173924}
   - component: {fileID: 1795392984287095275}
+  - component: {fileID: 2352202284669217358}
   m_Layer: 5
   m_Name: CalendarDay
   m_TagString: Untagged
@@ -159,6 +160,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!225 &2352202284669217358
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1972029659771118927}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &5245769733658392091
 GameObject:
   m_ObjectHideFlags: 0

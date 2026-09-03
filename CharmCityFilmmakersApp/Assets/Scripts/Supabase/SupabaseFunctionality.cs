@@ -31,6 +31,8 @@ public class SupabaseFunctionality : MonoBehaviour
 
     public int currentUserID;
 
+    public bool isAdmin;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private async void Start()
     {
@@ -71,14 +73,15 @@ public class SupabaseFunctionality : MonoBehaviour
         return result.Models.ToList<Reservations>();
     }
 
-    public async Task<bool> CreateReservations( List<int> roomIDs, DateTime start, DateTime end)
+    public async Task<bool> CreateReservations( List<int> roomIDs, DateTime start, DateTime end, int groupID)
     {
         var parameters = new Dictionary<string, object>
     {
         { "p_room_ids", roomIDs.ToArray() },
         { "p_user_id", currentUserID },
+        { "p_group_id", groupID},
         { "p_start_time", start },
-        { "p_end_time", end }
+        { "p_end_time", end },
     };
         Debug.Log("Calling sql querry");
         var result = await supabase.Rpc<bool>(
@@ -90,6 +93,58 @@ public class SupabaseFunctionality : MonoBehaviour
 
         return result;
     }
+
+    public async Task<bool> EditReservationGroup(int groupID, List<int> roomIDs, DateTime start, DateTime end)
+    {
+        var parameters = new Dictionary<string, object>
+    {
+        { "p_group_id", groupID },
+        { "p_user_id", currentUserID },
+        { "p_room_ids", roomIDs.ToArray() },
+        { "p_start_time", start },
+        { "p_end_time", end }
+    };
+
+        Debug.Log("Editing reservation group...");
+
+        var result = await supabase.Rpc<bool>(
+            "edit_reservation_group",
+            parameters
+        );
+
+        Debug.Log("Edit result: " + result);
+
+        return result;
+    }
+
+    public async Task<bool> DeleteReservationGroup(int groupID)
+    {
+        var parameters = new Dictionary<string, object>
+    {
+        { "p_group_id", groupID },
+        { "p_user_id", currentUserID }
+    };
+
+        var result = await supabase.Rpc<bool>(
+            "delete_reservation_group",
+            parameters
+        );
+
+        return result;
+    }
+
+    public async Task<List<Reservations>> GetReservationsForUser(int userID)
+    {
+        var result = await supabase
+            .From<Reservations>()
+            .Where(r => r.userId == userID)
+            .Where(r => r.endTime >= DateTime.Today)
+            .Order(r => r.startTime, Supabase.Postgrest.Constants.Ordering.Ascending)
+            .Get();
+
+        return result.Models;
+    }
+
 
 
     private async Task<Profiles> RetrieveProfile(int id)

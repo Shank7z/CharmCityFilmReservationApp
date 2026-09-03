@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 public class DayManager : MonoBehaviour
 {
-    public ReservationPopup reservationPopup;
     public TextMeshProUGUI dateText;
     public Transform barHolder;
     public BarManager[] bars;
@@ -31,7 +30,7 @@ public class DayManager : MonoBehaviour
         dateText.text = info.date.Day.ToString();
         if(info.reservationList?.Count > 0) barHolder.gameObject.SetActive(true);
         else barHolder.gameObject.SetActive(false);
-        SetBars();
+        SetBars(); 
     }
 
     public void Clear()

@@ -49,6 +49,7 @@ public class LoginHandler : MonoBehaviour
             Debug.Log("Login Worked");
             debugTextBox.text = "";
             SupabaseFunctionality.Instance.currentUserID = profile.id;
+            SupabaseFunctionality.Instance.isAdmin = profile.userStatus == Profiles.user_status.admin;
             AppController.Instance.ChangeScreen(Screens.Calendar);
         }
         else

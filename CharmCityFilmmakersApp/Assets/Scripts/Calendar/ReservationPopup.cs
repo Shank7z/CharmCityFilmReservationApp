@@ -4,14 +4,26 @@ using System.Collections;
 using TMPro;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-
+using UnityEngine.UI;
+// need title and notes
 public class ReservationPopup : MonoBehaviour
 {
+    public bool editing = false;
+    public int editingGroupID;
     public static ReservationPopup Instance;
     [SerializeField] private DayArgs info;
+    [SerializeField] private Transform reservationBarHolder;
+    [SerializeField] private Transform reservationBarPrefab;
+    [SerializeField] private Transform ErrorPopup;
     public TextMeshProUGUI dateText;
     public RoomSelector selector;
-    public ScrollRectSelector[] dateTimeSelectors;
+    public DropdownMenu startDate;
+    public DropdownMenu endDate;
+    public DropdownMenu startTime;
+    public DropdownMenu endTime;
+    public DropdownMenu repetition;
+
+    public List<Color> roomColors;
 
     private Coroutine fadeCoroutine;
     public float fadeSpeed;
@@ -22,35 +34,120 @@ public class ReservationPopup : MonoBehaviour
     {
         this.info = da;
         dateText.text = info.date.ToString("D");
+        StartCoroutine(SetDropdownValuesDelay());
+        SetupDisplay();
         StartFade(true);
-        foreach(ScrollRectSelector s in dateTimeSelectors)
+    }
+
+    public void ToggleErrorPopup(bool b)
+    {
+        ErrorPopup.gameObject.SetActive(b);
+    }
+
+    private void SetupDisplay()
+    {
+
+        DateTime dayStart = info.date;
+        DateTime dayEnd = dayStart.AddDays(1);
+
+        foreach (Reservations r in info.reservationList)
         {
-            s.Setup(da);
+            if (r.endTime <= dayStart || r.startTime >= dayEnd)
+                continue;
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(
+                reservationBarHolder.GetComponent<RectTransform>()
+            );
+            int totalWidth = (int)reservationBarHolder
+                .GetComponent<RectTransform>().rect.width;
+
+            int anchoredX = (totalWidth / 5) * ((int)r.roomID - 1);
+
+            DateTime displayStart = r.startTime > dayStart
+                ? r.startTime
+                : dayStart;
+
+            DateTime displayEnd = r.endTime < dayEnd
+                ? r.endTime
+                : dayEnd;
+
+            float startHour = (float)(displayStart - dayStart).TotalHours;
+            float duration = (float)(displayEnd - displayStart).TotalHours;
+
+            Transform temp = Instantiate(
+                reservationBarPrefab,
+                reservationBarHolder
+            );
+
+            temp.GetComponent<Image>().color =
+                roomColors[(int)r.roomID - 1];
+
+            RectTransform tempRect =
+                temp.GetComponent<RectTransform>();
+
+            tempRect.anchoredPosition = new Vector2(
+                anchoredX,
+                (-startHour * 100) - 1
+            );
+
+            tempRect.sizeDelta = new Vector2(
+                tempRect.rect.width,
+                (duration * 100) - 2
+            );
+        }
+    }
+    private void SetStartingValues(DropdownMenu dropdown, bool isDate, bool start)
+    {
+        if (isDate)
+        {
+            dropdown.dropdowns[0].SetDropDownValue(info.date.Month.ToString());
+            dropdown.dropdowns[1].SetDropDownValue(info.date.Day.ToString());
+            dropdown.dropdowns[2].SetDropDownValue(info.date.Year.ToString());
+        }
+
+        else
+        {
+            int hourIncrease = 1;
+            if (start) hourIncrease = 0;
+            int ampm = DateTime.Now.Hour + hourIncrease > 12 ? 12 : 0;
+            string ampmText = ampm == 0 ? "am" : "pm";
+
+            dropdown.dropdowns[0].SetDropDownValue((DateTime.Now.AddHours(hourIncrease).Hour - ampm).ToString());
+            dropdown.dropdowns[1].SetDropDownValue("00");
+            dropdown.dropdowns[2].SetDropDownValue(ampmText);
         }
     }
     private void Start()
     {
-        if(Instance == null)
-        {
-            Instance = this;
-        }
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
     public void UpdateTimes()
     {
-        this.start = new DateTime(info.date.Year, info.date.Month, info.date.Day, (int)dateTimeSelectors[0].time.x, (int)dateTimeSelectors[0].time.y,0);
-        this.end = new DateTime((int)dateTimeSelectors[2].date.z, (int)dateTimeSelectors[2].date.x, (int)(dateTimeSelectors[2].date.y), (int)dateTimeSelectors[1].time.x, (int)dateTimeSelectors[1].time.y, 0);
+        SetStartingValues(startDate, true, true);
+        SetStartingValues(startTime, false, true);
+        SetStartingValues(endDate, true, false);
+        SetStartingValues(endTime, false, false);
+        repetition.dropdowns[0].SetDropDownValue("Does not repeat");
     }
 
     public void Close()
     {
+        editing = false;
+        Refresh();
         Debug.Log("Attempting to close");
         StartFade(false);
     }
 
+    private async Task Refresh()
+    {
+        Debug.Log("Refreshing");
+        await CalendarManager.Instance.RefreshCalendar();
+    }
+
     public void StartFade(bool alphaIncrease)
     {
-
         if (fadeCoroutine != null)
         {
             StopCoroutine(fadeCoroutine);
@@ -71,20 +168,26 @@ public class ReservationPopup : MonoBehaviour
             GetComponent<CanvasGroup>().alpha += fadeSpeed * change * Time.deltaTime;
             yield return null;
         }
-        if (!alphaIncrease) gameObject.SetActive(false);
+        if (!alphaIncrease)
+        {
+            gameObject.SetActive(false);
+            foreach (Transform t in reservationBarHolder)
+            {
+                Destroy(t.gameObject);
+            }
+            ToggleErrorPopup(false);
+        }
     }
 
     public void SubmitReservations()
     {
-
         Debug.Log("Button clicked");
         _ = AttemptCreateReservations();
+
     }
     public async Task AttemptCreateReservations()
     {
-        Debug.Log("Starting reservation attempt");
         List<int> selectedRoomIDs = new();
-
         for (int x = 0; x < selector.roomButtons.Length; x++)
         {
             if (selector.roomButtons[x].isOn)
@@ -101,29 +204,100 @@ public class ReservationPopup : MonoBehaviour
             return;
         }
 
-        Debug.Log("Sending reservation request");
+        int recurrenceAmount = 1;
+        int interval = 0;
+        if (repetition.GetString() == "Repeats weekly")
+        {
+            recurrenceAmount = 104;
+            interval = 1;
+        }
+        else if (repetition.GetString() == "Repeats monthly")
+        {
+            recurrenceAmount = 24;
+            interval = 2;
+        }
 
-        bool success = await SupabaseFunctionality.Instance.CreateReservations(
-            selectedRoomIDs,
-            start,
-            end
-        );
+        Debug.Log("Acquiring dateTimes");
+        DateTime tempTime = startTime.GetTime();
+        DateTime tempDate = startDate.GetDate();
 
-        Debug.Log("Reservation request returned");
+        Debug.Log("Starting reservation attempt");
+        start = new DateTime(tempDate.Year, tempDate.Month, tempDate.Day, tempTime.Hour, tempTime.Minute, 0);
+        tempTime = endTime.GetTime();
+        tempDate = endDate.GetDate();
+        end = new DateTime(tempDate.Year, tempDate.Month, tempDate.Day, tempTime.Hour, tempTime.Minute, 0);
+
+        if (end < start)
+        {
+            Debug.Log("Invalid end date/time");
+            return;
+        }
+
+        Debug.Log("Start: " + start.ToString("yyyy-MM-dd HH:mm:ss"));
+        Debug.Log("End:   " + end.ToString("yyyy-MM-dd HH:mm:ss"));
+        Debug.Log("Duration: " + (end - start).TotalHours + " hours");
+        Debug.Log("Start: " + start.ToString("f") + " - " + end.ToString("f"));
+        bool success = false;
+        int groupID = editing ? editingGroupID : SupabaseFunctionality.Instance.currentUserID * 10000000 + UnityEngine.Random.Range(0, 9999999);
+
+        //Debug.Log("Sending reservation request: " + x);
+        if (!editing)
+        {
+            for (int x = 0; x < recurrenceAmount; x++)
+            {
+                success = await SupabaseFunctionality.Instance.CreateReservations(
+                selectedRoomIDs,
+                start,
+                end,
+                groupID);
+                if (interval == 1)
+                {
+                    start = start.AddDays(7);
+                    end = end.AddDays(7);
+                }
+                else if (interval == 2)
+                {
+                    start = start.AddMonths(1);
+                    end = end.AddMonths(1);
+                }
+            }
+        }
+        else
+        {
+            success = await SupabaseFunctionality.Instance.EditReservationGroup(
+                groupID,
+                selectedRoomIDs,
+                start,
+                end);
+        
+        }
+        //Debug.Log("Reservation request returned: " + x);
+
+    
+
+
 
         if (success)
         {
             Debug.Log("Reservation created!");
 
-            // Close popup
-            // Refresh calendar
-            // Clear selections
+            Close();
         }
         else
         {
             Debug.Log("One or more rooms are unavailable.");
 
-            // Show error message to user
+            ToggleErrorPopup(true);
+        }
+    }
+
+    private IEnumerator SetDropdownValuesDelay()
+    {
+        yield return new WaitForSeconds(.1f);
+        UpdateTimes();
+        if (!SupabaseFunctionality.Instance.isAdmin)
+        {
+            repetition.gameObject.SetActive(false);
         }
     }
 }

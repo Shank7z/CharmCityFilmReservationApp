@@ -29,4 +29,7 @@ public class Reservations : BaseModel, IHasID
 
     [Column("status")]
     public string? status { get; set; }
+
+    [Column("group_id")]
+    public int? groupID { get; set; }
 }

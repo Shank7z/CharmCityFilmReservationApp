@@ -2,8 +2,6 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
-using UnityEditor.ShaderKeywordFilter;
 
 
 public class RoomSelector : MonoBehaviour

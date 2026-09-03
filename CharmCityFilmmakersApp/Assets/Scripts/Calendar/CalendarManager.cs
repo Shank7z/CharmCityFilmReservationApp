@@ -11,13 +11,21 @@ public class CalendarManager : MonoBehaviour
     public Transform dayPrefab;
     public int daysToDisplay;
     public ReservationPopup reservationPopup;
-
+    public DateTime currentMonth;
     void Start()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
         LayoutSetup();
         PageSetup();
+    }
+
+    public async Task RefreshCalendar()
+    {
+        for (int x = 0; x < pages.Count; x++)
+        {
+            await pages[x].SetGrid(daysToDisplay);
+        }
     }
 
     private async void PageSetup()
@@ -41,7 +49,6 @@ public class CalendarManager : MonoBehaviour
                 pages[x].days.Add(day.GetComponent<DayManager>());
             }
         }
-
     }
 
     public async Task ChangeMonth(SingleMonthPage pageToUpdate, bool next)

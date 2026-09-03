@@ -19,7 +19,6 @@ public class CalendarSwipe : MonoBehaviour, IEndDragHandler, IBeginDragHandler, 
     private Vector2 dragStartPosition;
     private float pageWidth;
     private Coroutine slideCoroutine;
-    private bool snapping;
     private bool hasReordered;
 
     private void Start()
@@ -79,11 +78,6 @@ public class CalendarSwipe : MonoBehaviour, IEndDragHandler, IBeginDragHandler, 
         }
         else
         {
-            // Return to center if we interrupted too early
-            /*pages.anchoredPosition = new Vector2(
-                -pageWidth,
-                pages.anchoredPosition.y
-            );*/
         }
 
         dragStartPosition = pages.anchoredPosition;
@@ -95,7 +89,6 @@ public class CalendarSwipe : MonoBehaviour, IEndDragHandler, IBeginDragHandler, 
 
     private IEnumerator Snap(int page)
     {
-        snapping = true;
         hasReordered = false;
 
         float targetX = page * pageWidth;
@@ -120,13 +113,11 @@ public class CalendarSwipe : MonoBehaviour, IEndDragHandler, IBeginDragHandler, 
                 if (page == 2 && pages.anchoredPosition.x <= -pageWidth * 2)
                 {
                     MoveFirstPageToEnd();
-                    snapping = false;
                     yield break;
                 }
                 if (page == 0 && pages.anchoredPosition.x >= 0)
                 {
                     MoveLastPageToBeginning();
-                    snapping = false;
                     yield break;
                 }
             }
@@ -134,9 +125,8 @@ public class CalendarSwipe : MonoBehaviour, IEndDragHandler, IBeginDragHandler, 
             yield return null;
         }
 
+        CalendarManager.Instance.RefreshCalendar();
         pages.anchoredPosition = new Vector2(-pageWidth, pages.anchoredPosition.y);
-
-        snapping = false;
 
         if (!hasReordered)
         {
