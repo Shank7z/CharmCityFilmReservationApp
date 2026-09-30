@@ -32,4 +32,7 @@ public class Reservations : BaseModel, IHasID
 
     [Column("group_id")]
     public int? groupID { get; set; }
+
+    [Column("title")]
+    public string? title { get; set; }
 }

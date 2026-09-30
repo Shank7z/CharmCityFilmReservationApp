@@ -26,7 +26,7 @@ public class CalendarSwipe : MonoBehaviour, IEndDragHandler, IBeginDragHandler, 
         viewport = scrollRect.viewport;
         pageWidth = viewport.rect.width + spacing;
         pages.sizeDelta = new Vector2(pageWidth * 3 - spacing, pages.sizeDelta.y);
-        pages.anchoredPosition = new Vector2(pages.rect.x / 2, 0);
+        pages.anchoredPosition = new Vector2(-(pageWidth), 0);
         foreach(RectTransform rt in singlePages)
         {
             rt.sizeDelta = new Vector2(viewport.rect.width, rt.sizeDelta.y);

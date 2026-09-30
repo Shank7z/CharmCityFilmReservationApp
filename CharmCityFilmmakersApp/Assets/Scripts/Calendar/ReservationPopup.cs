@@ -23,6 +23,9 @@ public class ReservationPopup : MonoBehaviour
     public DropdownMenu endTime;
     public DropdownMenu repetition;
 
+    public TMP_InputField titleBox;
+    public TMP_InputField notesBox;
+
     public List<Color> roomColors;
 
     private Coroutine fadeCoroutine;
@@ -170,6 +173,10 @@ public class ReservationPopup : MonoBehaviour
         }
         if (!alphaIncrease)
         {
+            titleBox.text = string.Empty;
+            notesBox.text = string.Empty;
+            Debug.Log("VALUE: " + titleBox.text);
+            Debug.Log("VALUE: " + notesBox.text);
             gameObject.SetActive(false);
             foreach (Transform t in reservationBarHolder)
             {
@@ -201,6 +208,13 @@ public class ReservationPopup : MonoBehaviour
         if (selectedRoomIDs.Count == 0)
         {
             Debug.Log("Select at least one room.");
+            ErrorPopupManager.Instance.CreatePopup("Select at least 1 room to reserve", "ok", "Cancel", false);
+            return;
+        }
+
+        if(titleBox.text == string.Empty)
+        {
+            ErrorPopupManager.Instance.CreatePopup("Title required", "ok", "Cancel", false);
             return;
         }
 
@@ -239,7 +253,7 @@ public class ReservationPopup : MonoBehaviour
         Debug.Log("Start: " + start.ToString("f") + " - " + end.ToString("f"));
         bool success = false;
         int groupID = editing ? editingGroupID : SupabaseFunctionality.Instance.currentUserID * 10000000 + UnityEngine.Random.Range(0, 9999999);
-
+        
         //Debug.Log("Sending reservation request: " + x);
         if (!editing)
         {
@@ -249,7 +263,9 @@ public class ReservationPopup : MonoBehaviour
                 selectedRoomIDs,
                 start,
                 end,
-                groupID);
+                groupID,
+                titleBox.text == null ? string.Empty: titleBox.text,
+                notesBox.text == null ? string.Empty: notesBox.text);
                 if (interval == 1)
                 {
                     start = start.AddDays(7);

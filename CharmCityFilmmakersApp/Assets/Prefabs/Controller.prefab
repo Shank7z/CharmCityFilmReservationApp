@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 462938477569088047}
   - component: {fileID: 5160986158228148410}
   - component: {fileID: 8676879406523618841}
+  - component: {fileID: 3218076708440273253}
   m_Layer: 0
   m_Name: Controller
   m_TagString: Untagged
@@ -46,6 +47,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SupabaseFunctionality
   testTextBox: {fileID: 0}
+  currentUserID: 0
+  isAdmin: 0
 --- !u!114 &8676879406523618841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58,3 +61,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 819e7b237c182ee4daa1a5a0edaad6ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppController
+  splashScreen: {fileID: 0}
+  loginScreen: {fileID: 0}
+  loadingScreen: {fileID: 0}
+  calendarScreen: {fileID: 0}
+  currentScreen: {fileID: 0}
+--- !u!114 &3218076708440273253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6635478496122312567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cd0d0337347fda4480bc0dc389a558d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ErrorPopupManager
+  ErrorPopupPrefab: {fileID: 5986566252462943273, guid: 1605f2aaf3c9db442a7c2687b6216c44, type: 3}
+  currentPopup: {fileID: 0}
+  popupLocation: {x: 0, y: 0}

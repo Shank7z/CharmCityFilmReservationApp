@@ -13,14 +13,15 @@ public class RoomSelector : MonoBehaviour
 
     public float fadeSpeed;
     private Coroutine fadeCoroutine;
-    private int roomCount;
+    [SerializeField] private int roomCount;
 
     private void Start()
     {
         roomCount = 0;
         foreach(Toggle t in roomButtons)
         {
-            roomCount += t.isOn ? 1 : 0;
+            roomCount++;
+            t.isOn = false;
         }
         roomCountText.text = roomCount.ToString();
     }

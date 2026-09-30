@@ -15,6 +15,7 @@ public class SingleReservation : MonoBehaviour
     public Transform[] roomIcons;
 
     public TextMeshProUGUI dateText;
+    public TextMeshProUGUI titleText;
     public void Setup(List<Reservations> reservations)
     {
         popup = GetComponentInParent<UpcomingReservationsPage>(true).reservationPopup;
@@ -23,7 +24,10 @@ public class SingleReservation : MonoBehaviour
         DateTime end = reservations[0].endTime;
         deleteButton.onClick.AddListener(DeleteReservation);
         editButton.onClick.AddListener(OpenEditPopup);
-        dateText.text = start.ToString("f") + "\n-\n" + end.ToString("f");
+        titleText.text = reservations[0].title;
+        dateText.text = "Start: " + start.ToString("d") +" " + start.ToString("t") + 
+            "\n" +
+            "End:  " + end.ToString("d") + " " + end.ToString("t");
 
         foreach (Reservations r in reservations)
         {

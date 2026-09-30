@@ -73,7 +73,7 @@ public class SupabaseFunctionality : MonoBehaviour
         return result.Models.ToList<Reservations>();
     }
 
-    public async Task<bool> CreateReservations( List<int> roomIDs, DateTime start, DateTime end, int groupID)
+    public async Task<bool> CreateReservations( List<int> roomIDs, DateTime start, DateTime end, int groupID, string title, string notes)
     {
         var parameters = new Dictionary<string, object>
     {
@@ -82,6 +82,8 @@ public class SupabaseFunctionality : MonoBehaviour
         { "p_group_id", groupID},
         { "p_start_time", start },
         { "p_end_time", end },
+        { "p_notes", notes },
+        { "p_title", title }
     };
         Debug.Log("Calling sql querry");
         var result = await supabase.Rpc<bool>(
